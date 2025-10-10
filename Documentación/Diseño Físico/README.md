@@ -1,4 +1,4 @@
-# QuimLab – Documentación Técnica del Esquema (SQL Server)
+# QuimLab (SQL Server)
 
 > **Resumen rápido**
 > - **BD:** QuimLab (compatibilidad 160)
@@ -8,7 +8,7 @@
 
 ---
 
-## 1. Creación de la Base de Datos (y explicación)
+## 1. Creación de la Base de Datos 
 
 ```sql
 USE [master];
