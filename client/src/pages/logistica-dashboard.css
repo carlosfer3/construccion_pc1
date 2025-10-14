@@ -1,0 +1,357 @@
+/* Logística Dashboard Styles - Identical to Instructor */
+.logisticax {
+  --bg1: #0b1020;           /* base */
+  --bg2: #0f172a;           /* slate-900 */
+  --accent: #f59e0b;        /* amber-500 */
+  --accent-2: #fbbf24;      /* amber-400 */
+  --text: #e5e7eb;          /* gray-200 */
+  --muted: #94a3b8;         /* slate-400 */
+  --border: #1f2937;        /* slate-700 */
+  --card: #0b1020cc;        /* glass */
+  --card-strong: #0b1229;   /* inputs / chips */
+  --radius: 16px;
+  --shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.05);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  color: var(--text);
+  background: radial-gradient(900px 600px at 15% 10%, #221a0a 0%, transparent 60%),
+              radial-gradient(900px 600px at 85% 20%, #3a2a0b 0%, transparent 55%),
+              linear-gradient(160deg, var(--bg1), var(--bg2));
+  display: grid; 
+  grid-template-columns: 260px 1fr; 
+  overflow: hidden;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased; 
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: .1px;
+}
+
+.logisticax .sidebar { 
+  background: #1a1a0baa; 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+  border-right: 1px solid #29140b; 
+  padding: 20px 14px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 14px; 
+}
+
+.logisticax .brand { 
+  font-weight: 900; 
+  font-size: 20px; 
+  padding: 6px 10px; 
+  color: var(--accent);
+}
+
+.logisticax .nav { 
+  display: grid; 
+  gap: 6px; 
+}
+
+.logisticax .nav a { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 12px 12px; 
+  border-radius: 12px; 
+  color: #e5e7eb; 
+  text-decoration: none; 
+  font-weight: 800; 
+  background: transparent; 
+  border: 1px solid transparent; 
+  transition: transform .12s ease, background .18s ease, border-color .18s ease; 
+}
+
+.logisticax .nav a:hover { 
+  background: #291a0b; 
+  border-color: #352613; 
+  transform: translateY(-1px); 
+}
+
+.logisticax .nav a.active { 
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+  color: #0b1020; 
+  border-color: transparent; 
+  box-shadow: 0 0 0 2px #00000022 inset; 
+}
+
+.logisticax .user { 
+  margin-top: auto; 
+  border-top: 1px solid #281810; 
+  padding-top: 14px; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  color: #cbd5e1; 
+}
+
+.logisticax .avatar { 
+  width: 38px; 
+  height: 38px; 
+  border-radius: 50%; 
+  display: grid; 
+  place-items: center; 
+  background: #371a14; 
+  color: #ffa28d; 
+  font-weight: 900; 
+  box-shadow: inset 0 0 0 1px #652630; 
+}
+
+.logisticax .main { 
+  display: grid; 
+  grid-template-rows: auto 1fr; 
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.logisticax .topbar { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  padding: 14px 18px; 
+  border-bottom: 1px solid #2f160f; 
+  background: #0b1020aa; 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+  position: sticky; 
+  top: 0; 
+  z-index: 5; 
+}
+
+.logisticax .actions { 
+  margin-left: auto; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+}
+
+.logisticax .content {
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100vh - 80px);
+  width: 100%;
+  background: transparent;
+  position: relative;
+}
+
+/* AI Search Bar - Más largo y delgado */
+.logisticax .ia-search {
+  position: relative; 
+  isolation: isolate;
+  display: flex; 
+  align-items: center; 
+  gap: 10px;
+  background: #2a1e18;
+  border-radius: 20px; 
+  padding: 8px 16px;
+  border: 2px solid #3a2a23;
+  width: 600px;
+  height: 40px;
+  transition: transform .3s, box-shadow .35s, border-color .3s;
+}
+
+.logisticax .ia-search:hover,
+.logisticax .ia-search:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35), 0 0 20px rgba(251, 191, 36, 0.35);
+  border-color: transparent;
+}
+
+.logisticax .ia-search::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent));
+  opacity: 0;
+  transition: opacity .35s;
+  padding: 2px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.logisticax .ia-search:hover::after,
+.logisticax .ia-search:focus-within::after {
+  opacity: 1;
+}
+
+.logisticax .ia-search input[type="search"] {
+  position: relative;
+  z-index: 1;
+  appearance: none;
+  border: none;
+  outline: none;
+  flex: 1 1 auto;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 15px;
+  caret-color: var(--accent);
+}
+
+.logisticax .ia-search input::placeholder {
+  color: #9aa0aa;
+  font-size: 13px;
+}
+
+.logisticax .ia-search button {
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.logisticax .ia-search button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.logisticax .ia-search button svg {
+  width: 22px;
+  height: 22px;
+  fill: #fff;
+  transition: transform .2s;
+}
+
+.logisticax .ia-search button:hover:not(:disabled) svg {
+  transform: scale(1.1);
+}
+
+/* AI Response Panel - Más largo y delgado */
+.logisticax .ai-response {
+  position: fixed;
+  top: 90px;
+  right: 40px;
+  z-index: 9999;
+  background: rgba(42, 30, 24, 0.98);
+  color: #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0008;
+  padding: 28px 32px;
+  min-width: 480px;
+  max-width: 520px;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 1px solid #3a2a23;
+  animation: fadeIn .3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards and Components */
+.logisticax .dash-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.logisticax .dash-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.logisticax .dash-card-header {
+  margin-bottom: 20px;
+}
+
+.logisticax .dash-card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.logisticax .dash-card-muted {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Form Elements */
+.logisticax select,
+.logisticax input {
+  background: var(--card-strong);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.logisticax select:focus,
+.logisticax input:focus {
+  border-color: var(--accent);
+}
+
+.logisticax button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logisticax button:hover {
+  background: var(--accent-2);
+}
+
+.logisticax button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .logisticax {
+    grid-template-columns: 1fr;
+  }
+  
+  .logisticax .sidebar {
+    display: none;
+  }
+  
+  .logisticax .ia-search {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .logisticax .ai-response {
+    right: 20px;
+    left: 20px;
+    max-width: calc(100vw - 40px);
+  }
+}

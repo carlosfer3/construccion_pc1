@@ -203,11 +203,31 @@ export default function AdminDashboard(){
   // Critico: 0..5, Bajo: >5..10, Normal: >10
   function stockClass(s){ if (s<=5) return 'stock crit'; if (s<=10) return 'stock low'; return 'stock ok' }
   async function adjustStock(idInsumo, delta){
+    console.log('🔧 Adjusting stock for:', idInsumo, 'delta:', delta)
     try{ 
-      const r = await api.patch(`/api/insumos/${encodeURIComponent(idInsumo)}/stock`, { delta })
-      setIns(list => list.map(x => x.idInsumo===idInsumo ? { ...x, stock: r.stock } : x))
+      const url = `/api/insumos/${encodeURIComponent(idInsumo)}/stock`
+      console.log('📡 Making PATCH request to:', url)
+      
+      const r = await api.patch(url, { delta })
+      console.log('✅ Stock adjustment response:', r)
+      
+      // Actualizar el estado local
+      setIns(list => list.map(x => {
+        if (x.idInsumo === idInsumo) {
+          console.log(`📊 Updating stock for ${idInsumo}: ${x.stock} → ${r.stock}`)
+          return { ...x, stock: r.stock }
+        }
+        return x
+      }))
+      
       refreshKpis()
-    } catch{}
+      console.log('🎉 Stock updated successfully!')
+      
+    } catch(err) {
+      console.error('❌ Error adjusting stock:', err)
+      console.error('Error details:', err.message)
+      alert(`Error al ajustar el stock: ${err.message}`)
+    }
   }
 
   // Card estilo moderno para inventario (sin tablas)
@@ -265,7 +285,7 @@ export default function AdminDashboard(){
           <NavLink end to="/admin">Dashboard</NavLink>
           <NavLink to="/admin/solicitudes">Solicitudes</NavLink>
           <NavLink to="/admin/inventario">Inventario</NavLink>
-          <NavLink to="/admin/entregas">Entregas</NavLink>
+          <NavLink to="/admin/prestamos">Préstamos</NavLink>
           <NavLink to="/admin/usuarios">Usuarios</NavLink>
           <NavLink to="/admin/reportes">Reportes</NavLink>
         </nav>
@@ -406,43 +426,243 @@ export default function AdminDashboard(){
             </div>
           )}
           {section === 'inventario' && (
-            <div style={{display:'grid', gap:18}}>
-              <div className="card">
-                <div className="toolbar" style={{position:'relative', zIndex:2}}>
-                  <strong>Inventario</strong>
-                  <input className="sol-filter" placeholder="Buscar…" value={invFilters.q} onChange={(e)=> setInvFilters(f=>({...f, q:e.target.value}))} />
-                  <select className="sol-filter" value={invFilters.idTipo} onChange={(e)=> setInvFilters(f=>({...f, idTipo:e.target.value}))}>
-                    <option value="">Todos los tipos</option>
-                    {tipos.length===0 ? <option value="" disabled>(sin tipos)</option> : tipos.map(t=> <option key={t.idTipo} value={t.idTipo}>{t.nombre}</option>)}
-                  </select>
-                  <label><input type="checkbox" checked={invFilters.prest} onChange={(e)=> setInvFilters(f=>({...f, prest:e.target.checked}))} /> Solo prestables</label>
-                  <label><input type="checkbox" checked={invFilters.low} onChange={(e)=> setInvFilters(f=>({...f, low:e.target.checked}))} /> Stock bajo</label>
-                  {/* Sin botón Actualizar: live search */}
-                  {invSoftLoading && <span className="muted">Cargando…</span>}
+            <div style={{ 
+              width: '100%', 
+              background: 'rgba(11, 18, 32, 0.9)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '16px',
+              padding: '32px',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'flex-start',
+                marginBottom: '24px'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#e5e7eb', margin: '0 0 8px 0' }}>
+                    Inventario
+                  </h2>
+                  <p style={{ color: '#94a3b8', margin: 0, fontSize: '16px' }}>
+                    Gestiona insumos disponibles, stock crítico y filtra por tipo o disponibilidad.
+                  </p>
                 </div>
-
-                {/* Formulario inline para nuevo insumo */}
-                <div className="toolbar" style={{flexWrap:'wrap'}}>
-                  <button className="btn-sm" onClick={()=> { if (tipos.length===0) loadTipos(); setInvModalOpen(true) }}>+ Nuevo insumo</button>
-                </div>
-
-                <div className={`space-y-4 fade ${invSoftLoading ? 'loading':''}`}>
-                  {invLoading && Array.from({length:6}).map((_,i)=> (
-                    <div key={'sk-inv'+i} className="skel-card">
-                      <div className="skel-row w80"></div>
-                      <div className="skel-row w60"></div>
-                      <div className="skel-row w40"></div>
-                    </div>
-                  ))}
-                  {!invLoading && ins.map(item => (
-                    <InvCard key={item.idInsumo} item={item} />
-                  ))}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(2, 1fr)', 
+                  gap: '16px',
+                  minWidth: '220px'
+                }}>
+                  <div style={{
+                    background: 'rgba(37, 99, 235, 0.1)',
+                    border: '1px solid rgba(37, 99, 235, 0.2)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    textAlign: 'center'
+                  }}>
+                    <span style={{ color: '#94a3b8', fontSize: '14px', display: 'block' }}>Total insumos</span>
+                    <strong style={{ color: '#e5e7eb', fontSize: '18px' }}>{ins.length}</strong>
+                  </div>
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.2)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    textAlign: 'center'
+                  }}>
+                    <span style={{ color: '#94a3b8', fontSize: '14px', display: 'block' }}>Stock crítico (≤5)</span>
+                    <strong style={{ color: '#f87171', fontSize: '18px' }}>{ins.filter(i => i.stock <= 5).length}</strong>
+                  </div>
                 </div>
               </div>
+
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr auto auto', 
+                gap: '12px',
+                marginBottom: '24px',
+                alignItems: 'end'
+              }}>
+                <input
+                  type="search"
+                  placeholder="Buscar por nombre o tipo…"
+                  value={invFilters.q}
+                  onChange={(e) => setInvFilters(f => ({...f, q: e.target.value}))}
+                  style={{ 
+                    padding: '10px 12px', 
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(255,255,255,0.2)', 
+                    background: '#1e293b', 
+                    color: '#e5e7eb',
+                    fontSize: '14px'
+                  }}
+                />
+                <select
+                  value={invFilters.idTipo}
+                  onChange={(e) => setInvFilters(f => ({...f, idTipo: e.target.value}))}
+                  style={{ 
+                    padding: '10px 12px', 
+                    borderRadius: '12px', 
+                    border: '1px solid rgba(255,255,255,0.2)', 
+                    background: '#1e293b', 
+                    color: '#e5e7eb',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="">Todos los tipos</option>
+                  {tipos.map(tipo => (
+                    <option key={tipo.idTipo} value={tipo.idTipo}>
+                      {tipo.nombre}
+                    </option>
+                  ))}
+                </select>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: '#e5e7eb', fontSize: '14px' }}>
+                  <input
+                    type="checkbox"
+                    checked={invFilters.prest}
+                    onChange={(e) => setInvFilters(f => ({...f, prest: e.target.checked}))}
+                  />
+                  Solo prestables
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: '#e5e7eb', fontSize: '14px' }}>
+                  <input
+                    type="checkbox"
+                    checked={invFilters.low}
+                    onChange={(e) => setInvFilters(f => ({...f, low: e.target.checked}))}
+                  />
+                  Stock crítico
+                </label>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <button 
+                  onClick={() => { if (tipos.length === 0) loadTipos(); setInvModalOpen(true) }}
+                  style={{
+                    background: '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '14px'
+                  }}
+                >
+                  + Nuevo insumo
+                </button>
+              </div>
+
+              {invLoading ? (
+                <div style={{ 
+                  padding: '40px', 
+                  textAlign: 'center', 
+                  color: '#94a3b8' 
+                }}>
+                  Cargando inventario…
+                </div>
+              ) : ins.length === 0 ? (
+                <div style={{ 
+                  padding: '40px', 
+                  textAlign: 'center', 
+                  color: '#94a3b8' 
+                }}>
+                  No se encontraron insumos con los filtros aplicados.
+                </div>
+              ) : (
+                <div style={{ 
+                  overflowX: 'auto',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}>
+                  <table style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    background: 'rgba(11, 18, 32, 0.6)'
+                  }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(37, 99, 235, 0.1)' }}>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>ID</th>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>Nombre</th>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>Tipo</th>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>Stock</th>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>Capacidad</th>
+                        <th style={{ padding: '12px', textAlign: 'left', color: '#e5e7eb', fontWeight: 600 }}>Préstamo</th>
+                        <th style={{ padding: '12px', textAlign: 'center', color: '#e5e7eb', fontWeight: 600 }}>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ins.map(item => {
+                        const capacidad = item.capacidad_valor
+                          ? `${item.capacidad_valor} ${item.capacidad_unidad || ''}`.trim()
+                          : '—'
+                        return (
+                          <tr key={item.idInsumo} style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <td style={{ padding: '12px', color: '#e5e7eb' }}>{item.idInsumo}</td>
+                            <td style={{ padding: '12px', color: '#e5e7eb' }}>{item.nombre}</td>
+                            <td style={{ padding: '12px', color: '#e5e7eb' }}>{item.tipoNombre || item.idTipo}</td>
+                            <td style={{ padding: '12px' }}>
+                              <span style={{
+                                background: item.stock <= 5 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(37, 99, 235, 0.2)',
+                                color: item.stock <= 5 ? '#f87171' : '#60a5fa',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '12px',
+                                fontWeight: 600
+                              }}>
+                                {item.stock}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px', color: '#e5e7eb' }}>{capacidad}</td>
+                            <td style={{ padding: '12px', color: '#e5e7eb' }}>{item.es_prestable ? 'Sí' : 'No'}</td>
+                            <td style={{ padding: '12px', textAlign: 'center' }}>
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                <button 
+                                  onClick={() => adjustStock(item.idInsumo, +1)}
+                                  style={{
+                                    background: '#16a34a',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  +1
+                                </button>
+                                <button 
+                                  onClick={() => adjustStock(item.idInsumo, -1)}
+                                  style={{
+                                    background: '#dc2626',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    fontWeight: 600
+                                  }}
+                                >
+                                  -1
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
           {section === 'entregas' && (
             <EntregasSection/>
+          )}
+          {section === 'prestamos' && (
+            <PrestamosSection/>
           )}
           {section === 'usuarios' && (
             <div style={{display:'grid', gap:18}}>
@@ -733,3 +953,85 @@ function EntregasSection(){
 // Se inserta al final del componente AdminDashboard (señal: justo antes del cierre del wrapper principal)
 
 // Modal for new insumo (rendered inside AdminDashboard root)
+
+function PrestamosSection(){
+  const [prestamos, setPrestamos] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [estado, setEstado] = useState('ACTIVOS')
+  const [idInsumo, setIdInsumo] = useState('')
+  const [idSolicitud, setIdSolicitud] = useState('')
+
+  async function load(){
+    const qs = new URLSearchParams();
+    if (estado) qs.set('estado', estado);
+    if (idInsumo) qs.set('idInsumo', idInsumo);
+    if (idSolicitud) qs.set('idSolicitud', idSolicitud);
+    setLoading(true)
+    try {
+      // Backend debe devolver los datos con joins: insumo, entregado_por, receptor
+      const data = await api.get('/api/prestamos?'+qs.toString());
+      setPrestamos(Array.isArray(data)? data:[])
+    } catch {} finally { setLoading(false) }
+  }
+  useEffect(()=>{ load() },[estado, idInsumo, idSolicitud])
+
+  async function marcarDevuelto(id){
+    try{ await api.post(`/api/prestamos/${encodeURIComponent(id)}/devolver`, {}); await load() } catch{}
+  }
+
+  return (
+    <div style={{display:'grid', gap:18}}>
+      <div className="card">
+        <div className="toolbar">
+          <strong>Préstamos</strong>
+          <select className="sol-filter" value={estado} onChange={e=> setEstado(e.target.value)}>
+            <option value="ACTIVOS">Activos</option>
+            <option value="VENCIDOS">Vencidos</option>
+            <option value="DEVUELTOS">Devueltos</option>
+          </select>
+          <input className="sol-filter" placeholder="ID Insumo" value={idInsumo} onChange={e=> setIdInsumo(e.target.value)} />
+          <input className="sol-filter" placeholder="ID Solicitud" value={idSolicitud} onChange={e=> setIdSolicitud(e.target.value)} />
+          <button className="btn-sm" disabled={loading} onClick={load}>{loading? 'Cargando…' : 'Actualizar'}</button>
+        </div>
+        <div className="cards">
+          {loading && Array.from({length:6}).map((_,i)=> (
+            <div key={'sk-pre'+i} className="skel-card"><div className="skel-row w60"></div><div className="skel-row w80"></div><div className="skel-row w40"></div></div>
+          ))}
+          {!loading && prestamos.length === 0 && (
+            <div className="muted" style={{padding:24}}>No hay préstamos en este estado.</div>
+          )}
+          {!loading && prestamos.map(p => (
+            <div key={p.idPrestamo} className="ins-card" style={{borderLeft:`6px solid ${p.devuelto ? '#34d399' : (p.fecha_compromiso && new Date(p.fecha_compromiso)<Date.now() && !p.devuelto ? '#f87171':'#60a5fa')}`}}>
+              <div className="ins-head" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div style={{fontWeight:900}}>Préstamo #{p.idPrestamo}</div>
+                {!p.devuelto && (
+                  <span className={`badge ${p.fecha_compromiso && new Date(p.fecha_compromiso)<Date.now() ? 'stock crit':'stock low'}`}>
+                    {p.fecha_compromiso && new Date(p.fecha_compromiso)<Date.now() ? 'VENCIDO':'ACTIVO'}
+                  </span>
+                )}
+              </div>
+              <div className="sol-meta">
+                <span><b>Insumo:</b> {p.insumo_nombre || p.idInsumo}</span>
+                <span><b>Cantidad:</b> {p.cantidad}</span>
+                <span><b>Solicitud:</b> {p.idSolicitud || '-'}</span>
+              </div>
+              <div className="sol-meta">
+                <span><b>Entregado por:</b> {p.entregado_por_nombre || p.entregado_por}</span>
+                <span><b>Receptor:</b> {p.receptor_nombre || p.idUsuario_receptor}</span>
+              </div>
+              <div className="sol-meta">
+                <span><b>Fecha préstamo:</b> {p.fecha_prestamo ? new Date(p.fecha_prestamo).toLocaleString() : '-'}</span>
+                <span><b>Compromiso:</b> {p.fecha_compromiso ? new Date(p.fecha_compromiso).toLocaleString() : '-'}</span>
+                <span><b>Devolución:</b> {p.fecha_devolucion ? new Date(p.fecha_devolucion).toLocaleString() : '-'}</span>
+              </div>
+              <div className="sol-meta">
+                <span style={{fontWeight:700, color:p.devuelto?'#34d399':'#f87171'}}><b>Devuelto:</b> {p.devuelto ? 'Sí' : 'No'}</span>
+              </div>
+              {!p.devuelto && <div className="ins-actions"><button className="btn-sm" onClick={()=> marcarDevuelto(p.idPrestamo)}>Marcar devuelto</button></div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

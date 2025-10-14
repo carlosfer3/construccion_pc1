@@ -4,11 +4,11 @@ GO
 -- Usuarios demo (si no existen)
 IF NOT EXISTS (SELECT 1 FROM dbo.usuarios WHERE idUsuario='ADM01')
 INSERT INTO dbo.usuarios (idUsuario, nombres, apellidos, correo, telefono, clave, idRol, estado, ultimo_acceso)
-VALUES ('ADM01','Ana','López','admin@quimlab.local',NULL,'$2a$10$1I4p4kXvHqYpJVB3f0n1rO2x3z4O3Eo2m6b6pG7a0U4kq8JpR6mFe','ADMIN','Activo',GETDATE());
+VALUES ('ADM01','Ana','López','admin@quimlab.local',NULL,'$2a$10$YdNqyOZAh4j.5K.SEjKB8./4kVOP2JrNo6xFftY9IOcwf4ezLs9TC','ADMIN','Activo',GETDATE());
 
 IF NOT EXISTS (SELECT 1 FROM dbo.usuarios WHERE idUsuario='INST01')
 INSERT INTO dbo.usuarios (idUsuario, nombres, apellidos, correo, telefono, clave, idRol, estado, ultimo_acceso)
-VALUES ('INST01','Ines','Torres','instructor@quimlab.local',NULL,'$2a$10$WwQOQm0IY7Q3iW8i0TtQ8u9d3x7h9w8Ks4yG0xkQSpKcRk2m6Y9G2','INSTR','Activo',GETDATE());
+VALUES ('INST01','Ines','Torres','instructor@quimlab.local',NULL,'$2a$10$YdNqyOZAh4j.5K.SEjKB8./4kVOP2JrNo6xFftY9IOcwf4ezLs9TC','INSTR','Activo',GETDATE());
 
 -- Cursos
 IF NOT EXISTS (SELECT 1 FROM dbo.cursos WHERE idCurso='CURS01')
@@ -17,6 +17,14 @@ IF NOT EXISTS (SELECT 1 FROM dbo.cursos WHERE idCurso='CURS02')
 INSERT INTO dbo.cursos (idCurso, nombre, creditos) VALUES ('CURS02','Química General II', 4);
 IF NOT EXISTS (SELECT 1 FROM dbo.cursos WHERE idCurso='CURS03')
 INSERT INTO dbo.cursos (idCurso, nombre, creditos) VALUES ('CURS03','Química Orgánica', 5);
+
+-- Asociar instructor con cursos
+IF NOT EXISTS (SELECT 1 FROM dbo.profesores_cursos WHERE idUsuario='INST01' AND idCurso='CURS01')
+INSERT INTO dbo.profesores_cursos (idUsuario, idCurso, rol_docente) VALUES ('INST01','CURS01','Titular');
+IF NOT EXISTS (SELECT 1 FROM dbo.profesores_cursos WHERE idUsuario='INST01' AND idCurso='CURS02')
+INSERT INTO dbo.profesores_cursos (idUsuario, idCurso, rol_docente) VALUES ('INST01','CURS02','Titular');
+IF NOT EXISTS (SELECT 1 FROM dbo.profesores_cursos WHERE idUsuario='INST01' AND idCurso='CURS03')
+INSERT INTO dbo.profesores_cursos (idUsuario, idCurso, rol_docente) VALUES ('INST01','CURS03','Auxiliar');
 
 -- Evaluaciones (prácticas)
 IF NOT EXISTS (SELECT 1 FROM dbo.evaluaciones WHERE idEvaluacion='EVAL01')
@@ -29,11 +37,22 @@ IF NOT EXISTS (SELECT 1 FROM dbo.evaluaciones WHERE idEvaluacion='EVAL03')
 INSERT INTO dbo.evaluaciones (idEvaluacion, idCurso, tipo, descripcion, fecha_inicio, fecha_fin)
 VALUES ('EVAL03','CURS03','PRACTICA','Síntesis de aspirina',  DATEADD(day, 6, CAST(GETDATE() AS date)), DATEADD(day, 6, CAST(GETDATE() AS date)));
 
+-- Prácticas
+IF NOT EXISTS (SELECT 1 FROM dbo.practicas WHERE idPractica='PRAC01')
+INSERT INTO dbo.practicas (idPractica, idCurso, tipo, descripcion, fecha_inicio, fecha_fin)
+VALUES ('PRAC01','CURS01','PRACTICA','Reacciones ácido‑base',  DATEADD(day, 2, CAST(GETDATE() AS date)), DATEADD(day, 2, CAST(GETDATE() AS date)));
+IF NOT EXISTS (SELECT 1 FROM dbo.practicas WHERE idPractica='PRAC02')
+INSERT INTO dbo.practicas (idPractica, idCurso, tipo, descripcion, fecha_inicio, fecha_fin)
+VALUES ('PRAC02','CURS02','PRACTICA','Análisis gravimétrico',  DATEADD(day, 4, CAST(GETDATE() AS date)), DATEADD(day, 4, CAST(GETDATE() AS date)));
+IF NOT EXISTS (SELECT 1 FROM dbo.practicas WHERE idPractica='PRAC03')
+INSERT INTO dbo.practicas (idPractica, idCurso, tipo, descripcion, fecha_inicio, fecha_fin)
+VALUES ('PRAC03','CURS03','PRACTICA','Síntesis de aspirina',  DATEADD(day, 6, CAST(GETDATE() AS date)), DATEADD(day, 6, CAST(GETDATE() AS date)));
+
 -- Grupos
 IF NOT EXISTS (SELECT 1 FROM dbo.grupos WHERE idGrupo='G001')
-INSERT INTO dbo.grupos (idGrupo, idEvaluacion, cantidad_integrantes) VALUES ('G001','EVAL01',5);
+INSERT INTO dbo.grupos (idGrupo, idPractica, cantidad_integrantes) VALUES ('G001','PRAC01',5);
 IF NOT EXISTS (SELECT 1 FROM dbo.grupos WHERE idGrupo='G002')
-INSERT INTO dbo.grupos (idGrupo, idEvaluacion, cantidad_integrantes) VALUES ('G002','EVAL02',6);
+INSERT INTO dbo.grupos (idGrupo, idPractica, cantidad_integrantes) VALUES ('G002','PRAC02',6);
 
 -- Tipos e insumos
 IF NOT EXISTS (SELECT 1 FROM dbo.tipo_insumos WHERE idTipo='T01')

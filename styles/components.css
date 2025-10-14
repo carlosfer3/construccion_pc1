@@ -1,0 +1,30 @@
+/* Text truncation utility */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card content with proper spacing */
+.card-content-spacing {
+  padding: 1rem;
+}
+
+/* Remove scrollbar styling for better appearance */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Form section spacing */
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}

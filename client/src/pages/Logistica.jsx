@@ -1,9 +1,11 @@
-export default function Logistica(){
+import { Routes, Route } from 'react-router-dom'
+import LogisticaDashboardNew from './LogisticaDashboardNew'
+
+export default function Logistica() {
   return (
-    <section className="card">
-      <h2 className="title">Logística</h2>
-      <p className="muted">Confirmación de disponibilidad o alternativas y registro de entrega/devolución. Pendiente de API.</p>
-    </section>
+    <Routes>
+      <Route path="/*" element={<LogisticaDashboardNew />} />
+    </Routes>
   )
 }
 

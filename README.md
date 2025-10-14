@@ -26,6 +26,9 @@ Rutas útiles:
 - `GET /api/health/db` -> prueba de conexión a la base de datos
 - `GET /api/usuarios` -> listado de usuarios (requiere tabla `usuarios`)
 - `GET /api/usuarios/by-correo?correo=alguien@correo.com`
+- `POST /api/prestamos` -> crear nuevo préstamo
+- `GET /api/prestamos` -> listar préstamos
+.\cloud-sql-proxy.exe --port 11433 "oceanic-impact-474415-r8:us-central1:christopher"
 
 ## ¿Dónde crear la base de datos?
 Puedes usar cualquier instancia de SQL Server accesible desde este backend:
@@ -64,6 +67,27 @@ VALUES
 ('U0002', 'Luis', 'García', 'luis@example.com', 'Activo', GETDATE());
 ```
 Con eso, `GET /api/usuarios` y `GET /api/usuarios/by-correo?correo=ana@example.com` deberían responder datos.
+
+## Script para tabla préstamos
+Si quieres usar la funcionalidad de préstamos, crea la tabla con esta estructura:
+```sql
+CREATE TABLE dbo.prestamos (
+  idPrestamo      INT IDENTITY(1,1) PRIMARY KEY,
+  idUsuario       VARCHAR(10)  NOT NULL,
+  idLibro         VARCHAR(10)  NOT NULL,
+  fechaPrestamo   DATETIME     NOT NULL DEFAULT GETDATE(),
+  fechaDevolucion DATETIME     NULL,
+  estado          VARCHAR(20)  NOT NULL DEFAULT 'Activo',
+  observaciones   VARCHAR(255) NULL,
+  FOREIGN KEY (idUsuario) REFERENCES dbo.usuarios(idUsuario)
+);
+```
+
+Ejemplo de inserción:
+```sql
+INSERT INTO dbo.prestamos (idUsuario, idLibro, fechaPrestamo, estado)
+VALUES ('U0001', 'L001', GETDATE(), 'Activo');
+```
 
 ## Notas
 - La conexión MSSQL usa `encrypt: true` y `trustServerCertificate: true` por compatibilidad. En producción, configura certificados adecuados.

@@ -86,14 +86,29 @@ CREATE TABLE dbo.evaluaciones (
 );
 GO
 
+-- PRACTICAS
+CREATE TABLE dbo.practicas (
+    idPractica     VARCHAR(10)  NOT NULL,
+    idCurso        VARCHAR(10)  NOT NULL,
+    tipo           VARCHAR(10)  NOT NULL,
+    descripcion    VARCHAR(200) NULL,
+    fecha_inicio   DATE         NOT NULL,
+    fecha_fin      DATE         NOT NULL,
+    CONSTRAINT PK_practicas PRIMARY KEY (idPractica),
+    CONSTRAINT FK_practicas_curso
+        FOREIGN KEY (idCurso) REFERENCES dbo.cursos(idCurso),
+    CONSTRAINT CK_practicas_fechas CHECK (fecha_fin >= fecha_inicio)
+);
+GO
+
 -- GRUPOS
 CREATE TABLE dbo.grupos (
     idGrupo               VARCHAR(10) NOT NULL,
-    idEvaluacion          VARCHAR(10) NOT NULL,
+    idPractica            VARCHAR(10) NOT NULL,
     cantidad_integrantes  INT         NOT NULL,
     CONSTRAINT PK_grupos PRIMARY KEY (idGrupo),
-    CONSTRAINT FK_grupos_evaluacion
-        FOREIGN KEY (idEvaluacion) REFERENCES dbo.evaluaciones(idEvaluacion),
+    CONSTRAINT FK_grupos_practica
+        FOREIGN KEY (idPractica) REFERENCES dbo.practicas(idPractica),
     CONSTRAINT CK_grupos_cant_integrantes_pos CHECK (cantidad_integrantes > 0)
 );
 GO
@@ -266,7 +281,7 @@ CREATE INDEX IX_insumos_idTipo ON dbo.insumos(idTipo);
 GO
 CREATE INDEX IX_evaluaciones_idCurso ON dbo.evaluaciones(idCurso);
 GO
-CREATE INDEX IX_grupos_idEvaluacion ON dbo.grupos(idEvaluacion);
+CREATE INDEX IX_grupos_idPractica ON dbo.grupos(idPractica);
 GO
 CREATE INDEX IX_solicitud_idGrupo ON dbo.solicitud(idGrupo);
 GO

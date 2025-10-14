@@ -1,9 +1,10 @@
+import React from 'react'
+
 export default function Cursos(){
   return (
-    <section className="card">
-      <h2 className="title">Cursos</h2>
-      <p className="muted">CRUD de cursos pendiente de API.</p>
-    </section>
+    <div style={{padding:24}}>
+      <h2>Cursos</h2>
+      <p>Vista de cursos (placeholder). Implementa la lista y administración de cursos aquí.</p>
+    </div>
   )
 }
-
