@@ -1,7 +1,5 @@
 # Especificación de Requisitos — QuimLab (Página Web)
 
-> Documento basado en el **script SQL proporcionado** (funcionalidades ya existentes en BD) y en las **extensiones** solicitadas (notas, reclamos, generador de grupos, vista de integrantes, exportación, promedio ponderado, modo oscuro, asistencia).
-
 ---
 
 ## 1) Catálogo de Requerimientos
