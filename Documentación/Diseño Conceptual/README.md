@@ -8,7 +8,7 @@
 
 ---
 
-## Diccionario de datos — Entidades (Rectángulos)
+## Diccionario de datos — Entidades
 
 ### Entidad: **Usuario**
 **Descripción:** Persona que interactúa con el sistema (docentes, alumnos, delegados, coordinadores/administradores).  
