@@ -1,7 +1,7 @@
 # 🧪 QuimLab – Sistema de Gestión de Laboratorios de Química
 
 ## 👥 Equipo de desarrollo
-- **Albino Solo Christopher Henrry**
+- **Albino Soto Christopher Henrry**
 - **Fernandez Iquise Carlos Benjamin**
 - **Rashuaman Sapallanay Ricco Didier**
 
