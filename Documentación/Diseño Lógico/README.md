@@ -2,6 +2,9 @@
 
 ## Esquema Relacional
 
+<p align="center">
+  <img src="DiseñoLogicoQuimLab.png" alt="QuimLab - Diseño Lógico" width="100%">
+</p>
 
 ---
 
