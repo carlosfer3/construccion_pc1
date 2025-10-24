@@ -1,7 +1,7 @@
 # QuimLab (SQL Server)
 
 > **Resumen rápido**
-> - **BD:** QuimLab (compatibilidad 160)
+> - **BD:** QuimLab
 > - **Modelo:** Gestión académica + inventario/insumos + solicitudes/préstamos + incidencias
 > - **Seguridad:** usuarios/roles; RBAC (`rol`, `permisos`, `roles_permisos`)
 > - **Integridad:** FKs, CHECKs, UNIQUEs, defaults e índices para rendimiento
