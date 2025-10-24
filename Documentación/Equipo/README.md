@@ -80,6 +80,3 @@ Cada iteración incluyó validación con los usuarios (profesor y alumnos) y doc
 *(Para la lista completa de requerimientos, consultar el documento de especificaciones funcionales).*
 
 ---
-
-## 📦 Estructura general del repositorio
-
